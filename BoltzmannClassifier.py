@@ -108,3 +108,28 @@ class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
         probas = self.predict_proba(X)
         indices = np.argmax(probas, axis=1)
         return self.classes_[indices]
+
+# Example
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import accuracy_score
+
+# Load dataset
+X, y = load_breast_cancer(return_X_y=True)
+
+# Scale the features
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split into train/test sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, random_state=42)
+
+# Use the custom BoltzmannClassifier
+clf = BoltzmannClassifier(k=1.0, T=1.0)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+
+# Evaluate
+print("Accuracy:", accuracy_score(y_test, y_pred))
+
