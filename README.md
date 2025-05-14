@@ -39,7 +39,7 @@ cd boltzmann-classifier
 pip install numpy scikit-learn matplotlib seaborn
 
 ### 3. Run Example
-python example_breast_cancer.py
+python BoltzmannClassifier.py
 
 On the Breast Cancer Wisconsin dataset, the Boltzmann Classifier achieves:
 
