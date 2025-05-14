@@ -36,7 +36,7 @@ git clone https://github.com/yourusername/boltzmann-classifier.git
 cd boltzmann-classifier
 
 ### 2.  Install dependencies
-pip install numpy scikit-learn matplotlib seaborn
+pip install numpy scikit-learn
 
 ### 3. Run Example
 python BoltzmannClassifier.py
