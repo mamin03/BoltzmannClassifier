@@ -114,6 +114,7 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 # Load dataset
 X, y = load_breast_cancer(return_X_y=True)
@@ -133,3 +134,11 @@ y_pred = clf.predict(X_test)
 # Evaluate
 print("Accuracy:", accuracy_score(y_test, y_pred))
 
+# Evaluate precision, recall, F1-score
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+print(f"Precision: {precision:.3f}")
+print(f"Recall:    {recall:.3f}")
+print(f"F1-score:  {f1:.3f}")
