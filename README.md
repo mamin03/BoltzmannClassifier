@@ -32,7 +32,7 @@ Inspired by principles from statistical mechanics, this classifier assigns proba
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/boltzmann-classifier.git
+git clone https://github.com/mamin03/BoltzmannClassifier.git
 cd boltzmann-classifier
 
 ### 2.  Install dependencies
