@@ -1,13 +1,13 @@
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
+import numpy as np
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.metrics import pairwise_distances
+
 class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
     """
-    Boltzmann Classifier
-
-    A simple, interpretable probabilistic classifier inspired by the Boltzmann distribution.
-    Class probabilities are computed from energy-based distances between the input features
-    and class centroids.
+    Boltzmann Classifier with energy based on distance to nearest neighbors in each class.
 
     Parameters
     ----------
@@ -17,57 +17,51 @@ class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
     T : float, default=1.0
         Temperature parameter controlling the softness of the probability distribution.
 
-    Attributes
-    ----------
-    classes_ : ndarray of shape (n_classes,)
-        Class labels seen during `fit`.
-
-    class_means_ : dict
-        Mapping from class label to mean feature vector (centroid).
+    n_neighbors : int, default=5
+        Number of nearest neighbors to use for energy computation.
     """
-    def __init__(self, k=1.0, T=1.0):
+    def __init__(self, k=1.0, T=1.0, n_neighbors=5):
         self.k = k
         self.T = T
+        self.n_neighbors = n_neighbors
 
     def fit(self, X, y):
         """
-        Compute the mean vector for each class.
+        Store training samples by class.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Training input samples.
-
         y : array-like of shape (n_samples,)
-            Target labels.
 
         Returns
         -------
         self : object
-            Fitted estimator.
         """
         self.classes_ = np.unique(y)
-        self.class_means_ = {
-            cls: X[y == cls].mean(axis=0)
-            for cls in self.classes_
+        self.class_samples_ = {
+            cls: X[y == cls] for cls in self.classes_
         }
         return self
 
-    def _energy(self, x, mean_vector):
+    def _energy(self, x, class_samples):
         """
-        Compute the energy of sample x relative to a class mean using L1 norm.
+        Compute the energy of sample x based on its distance to n nearest neighbors
+        in the given class.
 
         Parameters
         ----------
         x : ndarray of shape (n_features,)
-        mean_vector : ndarray of shape (n_features,)
+        class_samples : ndarray of shape (n_samples_in_class, n_features)
 
         Returns
         -------
         float
-            Energy value.
+            Energy value
         """
-        return np.sum(np.abs(x - mean_vector))
+        distances = np.linalg.norm(class_samples - x, axis=1)
+        nearest = np.sort(distances)[:self.n_neighbors]
+        return np.mean(nearest)
 
     def predict_proba(self, X):
         """
@@ -80,12 +74,11 @@ class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
         Returns
         -------
         proba : ndarray of shape (n_samples, n_classes)
-            Probability distribution over classes for each sample.
         """
         proba = []
         for x in X:
             energies = [
-                np.exp(-self._energy(x, self.class_means_[cls]) / (self.k * self.T))
+                np.exp(-self._energy(x, self.class_samples_[cls]) / (self.k * self.T))
                 for cls in self.classes_
             ]
             total = np.sum(energies)
@@ -103,11 +96,11 @@ class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
         Returns
         -------
         labels : ndarray of shape (n_samples,)
-            Predicted class labels.
         """
         probas = self.predict_proba(X)
         indices = np.argmax(probas, axis=1)
         return self.classes_[indices]
+
 
 # Example
 from sklearn.datasets import load_breast_cancer
