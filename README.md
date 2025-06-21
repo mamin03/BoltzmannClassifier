@@ -44,9 +44,9 @@ python BoltzmannClassifier.py
 On the Breast Cancer Wisconsin dataset, the Boltzmann Classifier achieves:
 
 Accuracy: 95%
-Precision (Malignant): 0.95
+Precision (Malignant): 0.97
 Recall (Malignant): 0.98
-F1-score (Average): 0.96
+F1-score (Average): 0.98
 
 License
 
