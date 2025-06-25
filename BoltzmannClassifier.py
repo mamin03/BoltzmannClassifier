@@ -1,8 +1,5 @@
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
-
-import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import pairwise_distances
 
 class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
@@ -101,6 +98,35 @@ class BoltzmannClassifier(BaseEstimator, ClassifierMixin):
         indices = np.argmax(probas, axis=1)
         return self.classes_[indices]
 
+class BoltzmannRegressor:
+    def __init__(self, n_neighbors=5, temperature=1.0):
+        self.n_neighbors = n_neighbors
+        self.temperature = temperature
+
+    def fit(self, X, y):
+        self.X_train = np.asarray(X)
+        self.y_train = np.asarray(y).ravel()  # Ensure 1D numpy array
+
+    def predict(self, X):
+        X = np.asarray(X)
+        preds = []
+        for x in X:
+            # Compute distances to *all* training samples
+            #print(x)
+            dists = pairwise_distances([x], self.X_train)[0]
+            
+            # Get indices of closest samples by POSITION
+            neighbor_pos = np.argsort(dists)[:self.n_neighbors]
+
+            # Fetch distances and y-values using positional indexing
+            neighbor_dists = dists[neighbor_pos]
+            neighbor_targets = self.y_train[neighbor_pos]
+
+            # Apply Boltzmann weighting
+            weights = np.exp(-neighbor_dists / self.temperature)
+            pred = np.sum(weights * neighbor_targets) / np.sum(weights)
+            preds.append(pred)
+        return np.array(preds)
 
 # Example
 from sklearn.datasets import load_breast_cancer
